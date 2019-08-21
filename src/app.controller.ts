@@ -31,7 +31,7 @@ export class AppController {
   @Get(':id/stats')
   async getStatus(@Res() res: Response, @Param() { id }: QueryDto) {
     try {
-      res.status(200).send(await this.appService.getRedirectStatus(id));
+      res.status(200).send(await this.appService.getRedirectStatus(id.trim()));
     } catch (e) {
       res.status(404).send({
         msg: 'Not Found',

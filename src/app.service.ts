@@ -55,29 +55,24 @@ export class AppService {
     }
   }
 
+  private async getUrl(id: string): Promise<UrlInterface> {
+    const queryResult = await this.urlDatabase.find({ shorted: id }).toArray();
+    if (queryResult.length === 0) {
+      throw new Error('There is nothing with given id.');
+    }
+    return queryResult[0];
+  }
+
   public async getOriginalURL(id: string): Promise<{
     url?: string;
   }> {
-    const queryResult = await this.urlDatabase.find({ shorted: id }).toArray();
-
-    if (queryResult.length === 0) {
-      throw new Error('There is nothing with given id.');
-    }
-
+    const url = (await this.getUrl(id)).origin;
     await this.urlDatabase.updateOne({ shorted: id }, { $push: { history: new Date() } });
-    return { url: queryResult[0].origin };
-  }
-
-  public async getRedirectHistory(id: string): Promise<Date[]> {
-    const queryResult = await this.urlDatabase.find({ shorted: id }).toArray();
-    if (queryResult.length === 0) {
-      throw new Error('There is nothing with given id.');
-    }
-    return queryResult[0].history;
+    return { url };
   }
 
   public async getRedirectStatus(id: string): Promise<RedirectStatus[]> {
-    const history = await this.getRedirectHistory(id);
+    const history = (await this.getUrl(id)).history;
     const tempStatusIndex: any = {};
     const result: RedirectStatus[] = [];
 
@@ -88,7 +83,8 @@ export class AppService {
       tempStatusIndex[i] = (tempStatusIndex[i] || 0) + 1;
     }
 
-    for (const i of tempStatusIndex.keys()) {
+    // tslint:disable-next-line:forin
+    for (const i in tempStatusIndex) {
       result.push({
         at: `${i}:00:00`.replace(/T/, ' '),
         visits: tempStatusIndex[i],
