@@ -55,14 +55,18 @@ export class AppService {
   public async getOriginalURL(id: string): Promise<{
     url?: string;
   }> {
-    const queryResult = this.urlDatabase.find({ shorted: id });
-    const data = await queryResult.count() === 0 ? undefined : (await queryResult.toArray())[0];
-    if (data) {
-      await this.urlDatabase.updateOne({ shorted: id }, { $push: { history: new Date() } });
+    const queryResult = await this.urlDatabase.find({ shorted: id }).toArray();
+
+    if (queryResult.length === 0) {
+      throw new Error('There is nothing with given id.');
     }
-    return {
-      url: data ? data.origin : undefined,
-    };
+
+    await this.urlDatabase.updateOne({ shorted: id }, { $push: { history: new Date() } });
+    return { url: queryResult[0].origin };
+  }
+
+  public async getRedirectHistory(id: string): Promise<Date[]> {
+    return (await this.urlDatabase.find({ shorted: id }).toArray())[0].history;
   }
 
   public static randomId(): string {

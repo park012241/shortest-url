@@ -30,9 +30,12 @@ export class AppController {
 
   @Get(':id')
   async redirect(@Res() res: Response, @Param() { id }: RedirectDto) {
-    const { url } = await this.appService.getOriginalURL(id);
-    url ? res.redirect(301, url) : res.status(404).send({
-      msg: 'Not Found',
-    });
+    try {
+      res.redirect(301, (await this.appService.getOriginalURL(id)).url);
+    } catch (e) {
+      res.status(404).send({
+        msg: 'Not Found',
+      });
+    }
   }
 }
