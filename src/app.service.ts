@@ -12,7 +12,7 @@ export class AppService {
   private readonly hashToHourRegex = /[0-9]{4}-[0-1][0-9]-[0-3][0-9]T[0-1][0-9]/;
 
   constructor() {
-    this.mongoClient = new MongoClient('mongodb://localhost:27017/shortest', {
+    this.mongoClient = new MongoClient(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
