@@ -2,6 +2,7 @@ import { Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import { RegisterDto } from './dto/register.dto';
 import { Request } from 'express';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
@@ -13,6 +14,7 @@ export class AppController {
   }
 
   @Get()
+  @ApiExcludeEndpoint()
   getHello(): string {
     return AppService.getHello();
   }
@@ -22,7 +24,7 @@ export class AppController {
     url: string;
   }> {
     return {
-      url: `${req.hostname}${await this.appService.register(url)}`,
+      url: `http://localhost:3000/${await this.appService.register(url)}`,
     };
   }
 }
