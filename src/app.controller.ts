@@ -3,7 +3,7 @@ import { AppService } from './app.service';
 import { RegisterDto } from './dto/register.dto';
 import { Request, Response } from 'express';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { RedirectDto } from './dto/redirect.dto';
+import { QueryDto } from './dto/query.dto';
 
 @Controller()
 export class AppController {
@@ -28,8 +28,19 @@ export class AppController {
     });
   }
 
+  @Get(':id/stats')
+  async getStatus(@Res() res: Response, @Param() { id }: QueryDto) {
+    try {
+      res.status(200).send(await this.appService.getRedirectStatus(id));
+    } catch (e) {
+      res.status(404).send({
+        msg: 'Not Found',
+      });
+    }
+  }
+
   @Get(':id')
-  async redirect(@Res() res: Response, @Param() { id }: RedirectDto) {
+  async redirect(@Res() res: Response, @Param() { id }: QueryDto) {
     try {
       res.redirect(301, (await this.appService.getOriginalURL(id)).url);
     } catch (e) {

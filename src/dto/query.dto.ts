@@ -1,6 +1,6 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
-export class RedirectDto {
+export class QueryDto {
   @ApiModelProperty({
     description: 'URL id',
   })
