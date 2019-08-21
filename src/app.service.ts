@@ -73,23 +73,22 @@ export class AppService {
 
   public async getRedirectStatus(id: string): Promise<RedirectStatus[]> {
     const history = (await this.getUrl(id)).history;
-    const tempStatusIndex: any = {};
+    const tempStatusMap: Map<string, number> = new Map();
     const result: RedirectStatus[] = [];
 
     for (const i of history.reduce((previousValue, currentValue) => {
       previousValue.push(this.hashToHourRegex.exec(currentValue.toISOString())[0]);
       return previousValue;
     }, [] as string[])) {
-      tempStatusIndex[i] = (tempStatusIndex[i] || 0) + 1;
+      tempStatusMap.set(i, (tempStatusMap.get(i) || 0) + 1);
     }
 
-    // tslint:disable-next-line:forin
-    for (const i in tempStatusIndex) {
+    tempStatusMap.forEach((value, key) => {
       result.push({
-        at: `${i}:00:00`.replace(/T/, ' '),
-        visits: tempStatusIndex[i],
+        at: `${key}:00:00`.replace(/T/, ' '),
+        visits: value,
       });
-    }
+    });
 
     return result;
   }
