@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import { UrlInterface } from './interface/url.interface';
+import { MersenneTwister19937, string } from 'random-js';
 
 @Injectable()
 export class AppService {
@@ -23,7 +24,11 @@ export class AppService {
     return this.mongoClient.isConnected();
   }
 
-  getHello(): string {
+  static getHello(): string {
     return 'Hello World!';
+  }
+
+  public static randomId(): string {
+    return string()(MersenneTwister19937.autoSeed(), 9);
   }
 }
