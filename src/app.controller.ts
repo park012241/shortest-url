@@ -33,9 +33,13 @@ export class AppController {
     try {
       res.status(200).send(await this.appService.getRedirectStatus(id.trim()));
     } catch (e) {
-      res.status(404).send({
-        msg: 'Not Found',
-      });
+      if (e.message === 'There is nothing with given id.') {
+        res.status(404).send({
+          msg: 'Not Found',
+        });
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -44,9 +48,13 @@ export class AppController {
     try {
       res.redirect(301, (await this.appService.getOriginalURL(id)).url);
     } catch (e) {
-      res.status(404).send({
-        msg: 'Not Found',
-      });
+      if (e.message === 'There is nothing with given id.') {
+        res.status(404).send({
+          msg: 'Not Found',
+        });
+      } else {
+        throw e;
+      }
     }
   }
 }
