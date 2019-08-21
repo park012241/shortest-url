@@ -52,6 +52,19 @@ export class AppService {
     }
   }
 
+  public async getOriginalURL(id: string): Promise<{
+    url?: string;
+  }> {
+    const queryResult = this.urlDatabase.find({ shorted: id });
+    const data = await queryResult.count() === 0 ? undefined : (await queryResult.toArray())[0];
+    if (data) {
+      await this.urlDatabase.updateOne({ shorted: id }, { $push: { history: new Date() } });
+    }
+    return {
+      url: data ? data.origin : undefined,
+    };
+  }
+
   public static randomId(): string {
     return string()(MersenneTwister19937.autoSeed(), 9);
   }

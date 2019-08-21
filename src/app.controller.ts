@@ -1,8 +1,9 @@
-import { Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, Req, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { RegisterDto } from './dto/register.dto';
 import { Request, Response } from 'express';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { RedirectDto } from './dto/redirect.dto';
 
 @Controller()
 export class AppController {
@@ -20,10 +21,18 @@ export class AppController {
   }
 
   @Post('register.json')
-  async register(@Req() req: Request, @Res() res: Response, @Param() { url }: RegisterDto) {
+  async register(@Req() req: Request, @Res() res: Response, @Query() { url }: RegisterDto) {
     const result = await this.appService.register(url);
     res.status(result.isNew ? 201 : 200).send({
       url: `http://localhost:3000/${result.id}`,
+    });
+  }
+
+  @Get(':id')
+  async redirect(@Res() res: Response, @Param() { id }: RedirectDto) {
+    const { url } = await this.appService.getOriginalURL(id);
+    url ? res.redirect(301, url) : res.status(404).send({
+      msg: 'Not Found',
     });
   }
 }
