@@ -28,6 +28,21 @@ export class AppService {
     return 'Hello World!';
   }
 
+  public async register(url: string): Promise<string> {
+    const urlQuery = this.urlDatabase.find({ origin: url });
+    if (await urlQuery.count() === 1) {
+      return (await urlQuery.toArray())[0].shorted;
+    } else {
+      const randomId = AppService.randomId();
+      await this.urlDatabase.insertOne({
+        origin: url,
+        shorted: randomId,
+        history: [],
+      });
+      return randomId;
+    }
+  }
+
   public static randomId(): string {
     return string()(MersenneTwister19937.autoSeed(), 9);
   }
