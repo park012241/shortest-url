@@ -4,8 +4,6 @@ import { config } from 'dotenv';
 
 config();
 
-console.log(process.env.MONGODB_URI);
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(3000);

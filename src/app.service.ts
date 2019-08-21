@@ -4,15 +4,23 @@ import { UrlInterface } from './interface/url.interface';
 
 @Injectable()
 export class AppService {
+  private mongoClient: MongoClient;
   private urlDatabase: Collection<UrlInterface>;
 
   constructor() {
-    new MongoClient(process.env.MONGODB_URI, {
+    this.mongoClient = new MongoClient('mongodb://localhost:27017/shortest', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    }).connect().then((mongo) => {
-      this.urlDatabase = mongo.db().collection('urls');
     });
+  }
+
+  public async connect() {
+    this.urlDatabase = (await this.mongoClient.connect()).db().collection<UrlInterface>('urls');
+    await this.urlDatabase.createIndex('shorted');
+  }
+
+  public isConnected(): boolean {
+    return this.mongoClient.isConnected();
   }
 
   getHello(): string {
