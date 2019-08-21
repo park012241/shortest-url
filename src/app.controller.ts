@@ -24,7 +24,7 @@ export class AppController {
   async register(@Req() req: Request, @Res() res: Response, @Query() { url }: RegisterDto) {
     const result = await this.appService.register(url);
     res.status(result.isNew ? 201 : 200).send({
-      url: `http://localhost:3000/${result.id}`,
+      url: `${process.env.BASE_URL}/${result.id}`,
     });
   }
 
